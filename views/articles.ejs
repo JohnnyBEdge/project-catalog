@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1>Articles</h1>
+
+    <% for(let i = 0; i < data.length; i++) { %>
+        <ul>
+            <li> <p>Title: <%= data[i].title %> </p></li>
+            <ul>
+                <li><p>Author: <%= data[i].author %></p></li>
+                <li><p>Link: <%= data[i].link %></p></li>
+                <li><p>Description: <%= data[i].desc %></p></li>
+                <li><p>Topics: <%= data[i].topics %></p></li>
+                <li><p>Date Added: <%= data[i].dateAdded %></p></li>
+            </ul>
+        </ul>
+   <% } %>
+
+    <a href="/">Return Home</a>
+
+  </body>
+</html>
