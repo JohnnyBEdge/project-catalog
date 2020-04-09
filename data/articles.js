@@ -18,7 +18,7 @@ const invalidArticle = (article) => {
         result = "Articles require a title.";
     } else if(!article.link){
         result = "Articles require a link."
-    } else if(validURL(article.link)){
+    } else if(!validURL(article.link)){
         result = "Link not a valid URL."
     }
     return result;
@@ -90,6 +90,8 @@ const addArticle = (articles) => {
                         console.log("Connected successfully to server to GET artciles");
                         const db = client.db('wiki');
                         const collection = db.collection('articles');
+                        articles.forEach((article) => { 
+                            article.dateAdded = new Date(Date.now()).toUTCString();});
                         const results = await collection.insertMany(articles); 
                         resolve(results.ops);
                     }
