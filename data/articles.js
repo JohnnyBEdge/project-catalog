@@ -1,4 +1,5 @@
 const MongoClient = require('mongodb').MongoClient;
+const ObjectID = require('mongodb').ObjectID;
 const assert = require('assert');
  
 // Connection URL
@@ -63,12 +64,9 @@ const getArticles = () => {
 };
 
 const addArticle = (articles) => {
-    
-    // 
-
     const iou = new Promise((resolve, reject) => {
         if(!Array.isArray(articles)){
-            reject({msg:'Need to send an array of articles'})
+            reject({error:'Need to send an array of articles'})
         } else {
             const invalidArticles = articles.filter((article) => {
                 const check = invalidArticle(article)
@@ -79,7 +77,7 @@ const addArticle = (articles) => {
             });
             if(invalidArticles.length > 0){
                 reject({
-                    msg: "Some articles were invalid.",
+                    error: "Some articles were invalid.",
                     data: invalidArticles
                 })
             } else {
@@ -102,7 +100,92 @@ const addArticle = (articles) => {
     return iou;
 };
 
+
+const updateArticle = (id, article) => {
+    const iou = new Promise((resolve, reject) => {
+        if(article.link){
+            const check = invalidArticle(article)
+                if(!validURL(article.link)){
+                    article.invalid = 'Link not a valid URL';
+                    reject(article);
+                }
+        }
+        MongoClient.connect(url, settings, async function(err, client){
+            if(err){
+                reject(err);
+            } else {
+                console.log("connect successfully to server to PATCH an article");
+                const db = client.db(dbName);
+                const collection = db.collection(colName);
+                try{
+                    const _id = new ObjectID(id);
+                    collection.updateOne({_id}, 
+                        {$set: {...article}},
+                         function(err, data){
+                            if(err){
+                                reject(err);
+                            } else {
+                                if(data.result.n > 0){
+                                    collection.find({_id}).toArray(
+                                        function(err, docs){
+                                            if(err){
+                                                reject(err);
+                                            } else {
+                                                resolve(docs[0]);
+                                            };
+                                        }
+                                    );
+                                } else {
+                                    resolve({error: "Nothing updated"})
+                                };
+                            };
+                        });
+                } catch(err){
+                    console.log(err);
+                    reject({error: "Id has to be in ObjectID format"});
+                }
+            }
+        })
+    });
+    return iou;
+};
+
+
+
+const deleteArticle = (id) => {
+    const iou = new Promise((resolve, reject) => {
+        MongoClient.connect(url, settings, async function(err, client){
+            if(err){
+                reject(err);
+            } else {
+                console.log("Connected successfully to server to DELETE an artcile");
+                const db = client.db(dbName);
+                const collection = db.collection(colName);
+                try{
+                    const _id = new ObjectID(id);
+                    collection.findOneAndDelete({_id: ObjectID(id)}, function(err, data){
+                        if(err){
+                            reject(err);
+                        } else {
+                            if(data.lastErrorObject.n > 0){
+                                resolve(data.value);
+                            } else {
+                                resolve({error: "ID doesn't exist."});
+                            };  
+                        };
+                    });
+                }catch(err){
+                    reject({error: "ID has to be in ObjectId format."});
+                }
+            }
+        })
+    });
+    return iou;
+};
+
 module.exports = {
     getArticles,
-    addArticle
+    addArticle,
+    deleteArticle,
+    updateArticle
 }
