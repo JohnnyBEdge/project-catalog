@@ -5,11 +5,33 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
   <body>
+    <h2>Add Article</h2>
+    <form id="article_form" action="">
+      <label for="title_input">Article Title: </label>
+      <input id="title_input" for="title_input" type="text" placeholder="Title">
+
+      <label for="link_input">URL: </label>
+      <input id="link_input" type="text" placeholder="ex: http://www.google.com">
+
+      <label for="desc_input">Description: </label>
+      <!-- <input id="desc_input" type="textarea" placeholder="Description"> -->
+      <textarea id="desc_input" cols="35" rows="5">Description</textarea>
+
+      <label for="topic_input">Topics: </label>
+      <input id="topic_input" type="text" placeholder="ex: API, RESTful, Express...">
+
+      <input type="button" id="article_btn" value="Add Article">
+    </form>
+
     <h1>Articles</h1>
 
     <% for(let i = 0; i < data.length; i++) { %>
-        <ul>
-            <li> <p>Title: <%= data[i].title %> </p></li>
+        <ul> 
+            <li >
+                <p>Title: <%= data[i].title %> 
+                  <input type="button" id= "<%= data[i]._id %>" class="deleteBtns" value="X">
+                </p>
+            </li>
             <ul>
                 <li><p>Author: <%= data[i].author %></p></li>
                 <li><p>Link: <%= data[i].link %></p></li>
@@ -21,6 +43,6 @@
    <% } %>
 
     <a href="/">Return Home</a>
-
+      <script src="/javascripts/articles.js"></script>
   </body>
 </html>
